@@ -16,21 +16,6 @@ rbtree *new_rbtree(void)
   return p;
 }
 
-void delete_rbtree(rbtree *t)
-{
-  // TODO: reclaim the tree nodes's memory
-
-  node_t *node = t->root;
-
-  if (node != t->nil)
-  {
-    traverse_and_delete_node(t, node);
-  }
-
-  free(t->nil);
-  free(t);
-}
-
 void traverse_and_delete_node(rbtree *t, node_t *node)
 {
   if (node->left != t->nil)
@@ -45,46 +30,19 @@ void traverse_and_delete_node(rbtree *t, node_t *node)
   free(node);
 }
 
-node_t *rbtree_insert(rbtree *t, const key_t key)
+void delete_rbtree(rbtree *t)
 {
-  // TODO: implement insert
-  node_t *new_node = (node_t *)calloc(1, sizeof(node_t));
-  new_node->key = key;
-  new_node->color = RBTREE_RED;
-  new_node->left = new_node->right = t->nil;
+  // TODO: reclaim the tree nodes's memory
 
-  node_t *current = t->root;
-  while (current != t->nil)
-  {
-    if (key < current->key)
-    {
-      if (current->left == t->nil)
-      {
-        current->left = new_node;
-        break;
-      }
-      current = current->left;
-    }
-    else
-    {
-      if (current->right == t->nil)
-      {
-        current->right = new_node;
-        break;
-      }
-      current = current->right;
-    }
-  }
-  new_node->parent = current;
+  node_t *node = t->root;
 
-  if (current == t->nil)
+  if (node != t->nil)
   {
-    t->root = new_node;
+    traverse_and_delete_node(t, node);
   }
 
-  rbtree_insert_fixup(t, new_node);
-
-  return new_node;
+  free(t->nil);
+  free(t);
 }
 
 void rbtree_insert_fixup(rbtree *t, node_t *node)
@@ -146,6 +104,48 @@ void rbtree_insert_fixup(rbtree *t, node_t *node)
 
   right_rotate(t, parent);
   exchange_color(parent, parent->left);
+}
+
+node_t *rbtree_insert(rbtree *t, const key_t key)
+{
+  // TODO: implement insert
+  node_t *new_node = (node_t *)calloc(1, sizeof(node_t));
+  new_node->key = key;
+  new_node->color = RBTREE_RED;
+  new_node->left = new_node->right = t->nil;
+
+  node_t *current = t->root;
+  while (current != t->nil)
+  {
+    if (key < current->key)
+    {
+      if (current->left == t->nil)
+      {
+        current->left = new_node;
+        break;
+      }
+      current = current->left;
+    }
+    else
+    {
+      if (current->right == t->nil)
+      {
+        current->right = new_node;
+        break;
+      }
+      current = current->right;
+    }
+  }
+  new_node->parent = current;
+
+  if (current == t->nil)
+  {
+    t->root = new_node;
+  }
+
+  rbtree_insert_fixup(t, new_node);
+
+  return new_node;
 }
 
 void right_rotate(rbtree *t, node_t *node)
