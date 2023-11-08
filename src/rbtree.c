@@ -45,6 +45,58 @@ void delete_rbtree(rbtree *t)
   free(t);
 }
 
+void right_rotate(rbtree *t, node_t *node)
+{
+  node_t *parent = node->parent;
+  node_t *grand_parent = parent->parent;
+  node_t *node_right = node->right;
+
+  if (parent == t->root)
+  {
+    t->root = node;
+  }
+  else
+  {
+    if (grand_parent->left == parent)
+    {
+      grand_parent->left = node;
+    }
+    else
+    {
+      grand_parent->right = node;
+    }
+  }
+
+  node->parent = grand_parent;
+  node->right = parent;
+  parent->parent = node;
+  parent->left = node_right;
+  node_right->parent = parent;
+}
+
+void left_rotate(rbtree *t, node_t *node)
+{
+  node_t *parent = node->parent;
+  node_t *grand_parent = parent->parent;
+  node_t *node_left = node->left;
+
+  // 부모가 루트인 경우: 현재 노드를 루트로 지정 (노드를 삭제한 경우만 해당)
+  if (parent == t->root)
+    t->root = node;
+  else
+  { // 1-1) 노드의 부모를 grand_parent로 변경
+    if (grand_parent->left == parent)
+      grand_parent->left = node;
+    else
+      grand_parent->right = node;
+  }
+  node->parent = grand_parent; // 1-2) 노드를 grand_parent의 자식으로 변경 (양방향 연결)
+  parent->parent = node;       // 2-1) parent의 부모를 노드로 변경
+  node->left = parent;         // 2-2) parent를 노드의 자식으로 변경 (양방향 연결)
+  parent->right = node_left;   // 3-1) 노드의 자식의 부모를 parent로 변경
+  node_left->parent = parent;  // 3-2) 노드의 자식을 부모의 자식으로 변경 (양방향 연결)
+}
+
 void rbtree_insert_fixup(rbtree *t, node_t *node)
 {
   // TODO: implement rbtree_insert_fixup
@@ -146,57 +198,6 @@ node_t *rbtree_insert(rbtree *t, const key_t key)
   rbtree_insert_fixup(t, new_node);
 
   return new_node;
-}
-
-void right_rotate(rbtree *t, node_t *node)
-{
-  node_t *parent = node->parent;
-  node_t *grand_parent = parent->parent;
-  node_t *node_right = node->right;
-
-  if (parent == t->root)
-  {
-    t->root = node;
-  }
-  else
-  {
-    if (grand_parent->left == parent)
-    {
-      grand_parent->left = node;
-    }
-    else
-    {
-      grand_parent->right = node;
-    }
-  }
-
-  node->parent = grand_parent;
-  node->right = parent;
-  parent->parent = node;
-  parent->left = node_right;
-  node_right->parent = parent;
-}
-void left_rotate(rbtree *t, node_t *node)
-{
-  node_t *parent = node->parent;
-  node_t *grand_parent = parent->parent;
-  node_t *node_left = node->left;
-
-  // 부모가 루트인 경우: 현재 노드를 루트로 지정 (노드를 삭제한 경우만 해당)
-  if (parent == t->root)
-    t->root = node;
-  else
-  { // 1-1) 노드의 부모를 grand_parent로 변경
-    if (grand_parent->left == parent)
-      grand_parent->left = node;
-    else
-      grand_parent->right = node;
-  }
-  node->parent = grand_parent; // 1-2) 노드를 grand_parent의 자식으로 변경 (양방향 연결)
-  parent->parent = node;       // 2-1) parent의 부모를 노드로 변경
-  node->left = parent;         // 2-2) parent를 노드의 자식으로 변경 (양방향 연결)
-  parent->right = node_left;   // 3-1) 노드의 자식의 부모를 parent로 변경
-  node_left->parent = parent;  // 3-2) 노드의 자식을 부모의 자식으로 변경 (양방향 연결)
 }
 
 node_t *rbtree_find(const rbtree *t, const key_t key)
