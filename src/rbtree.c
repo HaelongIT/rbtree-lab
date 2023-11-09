@@ -404,8 +404,3 @@ int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n)
 
   return 0;
 }
-
-int main(void)
-{
-  rbtree *A = new_rbtree();
-}
